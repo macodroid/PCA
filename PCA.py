@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+import matplotlib.patches as mpatches
 
 """
 For convenience I used library pandas to load data.
@@ -42,7 +43,33 @@ if __name__ == '__main__':
     X_transformed = myPCA(norm_features, 2)
     print(X_transformed.shape)
 
-    X1 = X_transformed[:, 0]
-    X2 = X_transformed[:, 1]
+    # Get indices that meet define criteria in assignment for plotting data.
+    indices_cheap = np.nonzero(target <= 15.0)
+    indices_expensive = np.nonzero(target >= 30.0)
+    indices_cheap = np.reshape(indices_cheap, newshape=(-1))
+    indices_expensive = np.reshape(indices_expensive, newshape=(-1))
 
+    house_prices_cheap = target[indices_cheap]
+    house_prices_expensive = target[indices_expensive]
 
+    X_transform_plot_data_cheap = X_transformed[indices_cheap]
+    X_transform_plot_data_expensive = X_transformed[indices_expensive]
+
+    x1_cheap = X_transform_plot_data_cheap[:, 0]
+    x2_cheap = X_transform_plot_data_cheap[:, 1]
+
+    x1_expensive = X_transform_plot_data_expensive[:, 0]
+    x2_expensive = X_transform_plot_data_expensive[:, 1]
+
+    plt.scatter(x1_cheap, x2_cheap, c=house_prices_cheap, edgecolor="none", alpha=0.8,
+                cmap=plt.cm.get_cmap("Purples", 1))
+    plt.scatter(
+        x1_expensive, x2_expensive, c=house_prices_expensive, edgecolor="none", alpha=0.8,
+        cmap=plt.cm.get_cmap("Greens", 1)
+    )
+
+    plt.xlabel("Principal Component 1")
+    plt.ylabel("Principal Component 2")
+    plt.legend(handles=[mpatches.Patch(facecolor='purple', edgecolor='purple', label='under 15'),
+                        mpatches.Patch(facecolor='green', edgecolor='green', label='above 30')])
+    plt.show()
