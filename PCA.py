@@ -26,13 +26,13 @@ we are just joining those two rows in to the one.
 """
 def load_data():
     dataset_url = 'http://lib.stat.cmu.edu/datasets/boston'
-    raw_df = pd.read_csv(dataset_url, sep="\s+", skiprows=22, header=None)
-    return np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]]), np.asarray(raw_df.values[1::2, 2:3],
-                                                                                   dtype=np.float64)
+    data_frame = pd.read_csv(dataset_url, sep="\s+", skiprows=22, header=None)
+    return np.hstack([data_frame.values[::2, :], data_frame.values[1::2, :2]]), np.asarray(data_frame.values[1::2, 2:3],
+                                                                                           dtype=np.float64)
 
 
 """
-Standard process of normalizing data. First find mean then find standard deviation.
+Standard process of normalizing data. First find mean then standard deviation.
 Final step subtract mean from data and divide by standard deviation.    
 """
 def myNormalization(X):
@@ -42,7 +42,7 @@ def myNormalization(X):
 
 
 """
-Calculating variance, so we can see how much information  which pca component produce
+Calculating variance, so we can see how much information which pca component capture.
 """
 def _calculate_variance(eigenvalues):
     variance_for_each_comp = []
@@ -58,8 +58,9 @@ def _calculate_variance(eigenvalues):
 As input to the function myPCA are normalized features.
 1st calculate covariance matrix
 2nd calculate eigenvalues anc eigenvectors
-3rd sort eigenvectors. In descent order
-4th transform data to k components
+3rd calculate variance.
+4th sort eigenvectors. In descent order
+5th transform data to k components
 """
 def myPCA(X, k):
     # calculate covariance matrix
@@ -67,18 +68,19 @@ def myPCA(X, k):
 
     # calculate eigenvalues anc eigenvectors
     eigenvalues, eigenvectors = np.linalg.eig(sigma)
+
+    # calculate variance,so we have more inside about principal components.
     _calculate_variance(eigenvalues)
 
     # sort eigenvectors
     eigenvectors = eigenvectors.T
-    idxs = np.argsort(eigenvalues)[::-1]
-    eigenvalues = eigenvalues[idxs]
-    eigenvectors = eigenvectors[idxs]
+    indexes = np.argsort(eigenvalues)[::-1]
+    eigenvalues = eigenvalues[indexes]
+    eigenvectors = eigenvectors[indexes]
 
     # transform data to k components
     k_components = eigenvectors[0: k]
     return np.dot(X, k_components.T)
-
 
 
 if __name__ == '__main__':
